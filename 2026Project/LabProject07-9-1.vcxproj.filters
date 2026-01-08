@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="EffectLibrary">
+      <UniqueIdentifier>{a5ddc693-79da-4c0c-94e9-da5b203b75ba}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -60,11 +63,11 @@
     <ClInclude Include="d3dx12.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="EffectLibrary.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="ParticleSystem.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>EffectLibrary</Filter>
+    </ClInclude>
+    <ClInclude Include="EffectLibrary.h">
+      <Filter>EffectLibrary</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -104,11 +107,11 @@
     <ClCompile Include="DDSTextureLoader12.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="EffectLibrary.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="ParticleSystem.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>EffectLibrary</Filter>
+    </ClCompile>
+    <ClCompile Include="EffectLibrary.cpp">
+      <Filter>EffectLibrary</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

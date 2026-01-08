@@ -28,7 +28,7 @@ public:
 
 	void Animate(float fTimeElapsed);
 
-	void Render(ID3D12GraphicsCommandList* pd3dCommandList, const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projMatrix);
+	void Render(ID3D12GraphicsCommandList* pd3dCommandList);
 
 	void ResetParticles();
 

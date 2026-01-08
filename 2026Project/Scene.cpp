@@ -5,6 +5,8 @@
 #include "stdafx.h"
 #include "Scene.h"
 #include "WireframeBoxMesh.h"
+#include "EffectLibrary.h"
+
 #include <random>
 
 std::random_device rd;
@@ -158,7 +160,7 @@ void CScene::BuildGameObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLis
 	BuildDefaultLightsAndMaterials();
 
 	LoadTexture(pd3dDevice, pd3dCommandList);
-
+	
 	m_nGameObjects = 1 + 1 + 12 + 12 + 12 +1 +20 +20 +15 +15 + 4;
 	m_ppGameObjects = new CGameObject * [m_nGameObjects];
 
@@ -308,10 +310,11 @@ void CScene::BuildGameObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLis
 	}
 
 	CreateMirror(pd3dDevice, pd3dCommandList);
-	CreateParticle(pd3dDevice, pd3dCommandList);
 	CreateWireFrameBox(pd3dDevice, pd3dCommandList);
 	CreateAABBWireFrameBox(pd3dDevice, pd3dCommandList);
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
+	CEffectLibrary::Instance()->Initialize(pd3dDevice, pd3dCommandList);
 
 	m_pShadowShader = new CShadowShader();
 	m_pShadowShader->CreateShader(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
@@ -460,25 +463,6 @@ void CScene::CreateMirror(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	}
 }
 
-void CScene::CreateParticle(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
-{
-	m_pParticleEmitter = new CParticleEmitter(pd3dDevice, pd3dCommandList, 1000);
-
-	CMaterial* pParticleMaterial = new CMaterial();
-	CMaterialColors* pParticleColors = new CMaterialColors();
-	pParticleColors->m_xmf4Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	pParticleMaterial->SetMaterialColors(pParticleColors);
-
-	pParticleMaterial->SetShader(CMaterial::m_pParticleShader);
-
-	pParticleMaterial->SetTexture(m_d3dGpuExplosionSrvHandle);
-
-	m_pParticleEmitter->m_nMaterials = 1;
-	m_pParticleEmitter->m_ppMaterials = new CMaterial * [m_pParticleEmitter->m_nMaterials];
-	m_pParticleEmitter->m_ppMaterials[0] = NULL;
-	m_pParticleEmitter->SetMaterial(0, pParticleMaterial);
-}
-
 void CScene::CreateWireFrameBox(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	CWireframeBoxMesh* pDebugBoxMesh = new CWireframeBoxMesh(pd3dDevice, pd3dCommandList);
@@ -550,9 +534,6 @@ void CScene::ReleaseObjects()
 
 	if (m_pd3dCbvSrvHeap) m_pd3dCbvSrvHeap->Release();
 
-	if (m_pExplosionTexture) m_pExplosionTexture->Release();
-	if (m_pExplosionTextureUploadBuffer) m_pExplosionTextureUploadBuffer->Release();
-
 	if (m_pShadowShader) { m_pShadowShader->Release(); m_pShadowShader = NULL; }
 
 	m_pTreeTexture = NULL;
@@ -561,13 +542,13 @@ void CScene::ReleaseObjects()
 	m_pFlowerTexture = NULL;
 	m_pFlowerTextureUploadBuffer = NULL;
 
-	m_pExplosionTexture = NULL;
-	m_pExplosionTextureUploadBuffer = NULL;
-
 	m_pRockTexture = NULL;
 	m_pRockTextureUploadBuffer = NULL;
 
 	m_pd3dCbvSrvHeap = NULL;
+
+	// [추가] 라이브러리 리소스 해제 호출
+	CEffectLibrary::Instance()->Release();
 
 	ReleaseShaderVariables();
 
@@ -709,9 +690,6 @@ void CScene::ReleaseUploadBuffers()
 	if (m_pFlowerTextureUploadBuffer) m_pFlowerTextureUploadBuffer->Release();
 	m_pFlowerTextureUploadBuffer = NULL;
 
-	if (m_pExplosionTextureUploadBuffer) m_pExplosionTextureUploadBuffer->Release();
-	m_pExplosionTextureUploadBuffer = NULL;
-
 	if (m_pRockTextureUploadBuffer) m_pRockTextureUploadBuffer->Release();
 	m_pRockTextureUploadBuffer = NULL;
 }
@@ -819,7 +797,7 @@ void CScene::LoadTexture(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd
 		std::unique_ptr<uint8_t[]> ddsData;
 		std::vector<D3D12_SUBRESOURCE_DATA> subresources;
 
-		DirectX::LoadDDSTextureFromFile(pd3dDevice, L"Asset/Tree.dds", &m_pTreeTexture, ddsData, subresources);
+		DirectX::LoadDDSTextureFromFile(pd3dDevice, L"Asset/DDS_File/Tree.dds", &m_pTreeTexture, ddsData, subresources);
 		UINT64 nUploadBufferSize = GetRequiredIntermediateSize(m_pTreeTexture, 0, (UINT)subresources.size());
 		pd3dDevice->CreateCommittedResource(
 			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE,
@@ -846,7 +824,7 @@ void CScene::LoadTexture(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd
 		std::unique_ptr<uint8_t[]> ddsData;
 		std::vector<D3D12_SUBRESOURCE_DATA> subresources;
 
-		DirectX::LoadDDSTextureFromFile(pd3dDevice, L"Asset/Flower.dds", &m_pFlowerTexture, ddsData, subresources);
+		DirectX::LoadDDSTextureFromFile(pd3dDevice, L"Asset/DDS_File/Flower.dds", &m_pFlowerTexture, ddsData, subresources);
 		UINT64 nUploadBufferSize = GetRequiredIntermediateSize(m_pFlowerTexture, 0, (UINT)subresources.size());
 		pd3dDevice->CreateCommittedResource(
 			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE,
@@ -865,33 +843,6 @@ void CScene::LoadTexture(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd
 	}
 
 	{
-		D3D12_CPU_DESCRIPTOR_HANDLE d3dCpuSrvHandle_Slot2 = d3dCpuSrvHandleStart;
-		d3dCpuSrvHandle_Slot2.ptr += (m_nDescriptorIncrementSize * 2);
-		m_d3dGpuExplosionSrvHandle = d3dGpuSrvHandleStart;
-		m_d3dGpuExplosionSrvHandle.ptr += (m_nDescriptorIncrementSize * 2);
-
-		std::unique_ptr<uint8_t[]> ddsData;
-		std::vector<D3D12_SUBRESOURCE_DATA> subresources;
-
-		DirectX::LoadDDSTextureFromFile(pd3dDevice, L"Asset/Explosion.dds", &m_pExplosionTexture, ddsData, subresources);
-		UINT64 nUploadBufferSize = GetRequiredIntermediateSize(m_pExplosionTexture, 0, (UINT)subresources.size());
-		pd3dDevice->CreateCommittedResource(
-			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE,
-			&CD3DX12_RESOURCE_DESC::Buffer(nUploadBufferSize),
-			D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
-			__uuidof(ID3D12Resource), (void**)&m_pExplosionTextureUploadBuffer);
-		UpdateSubresources(pd3dCommandList, m_pExplosionTexture, m_pExplosionTextureUploadBuffer, 0, 0, (UINT)subresources.size(), subresources.data());
-		pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pExplosionTexture, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE));
-
-		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-		srvDesc.Format = m_pExplosionTexture->GetDesc().Format;
-		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-		srvDesc.Texture2D.MipLevels = m_pExplosionTexture->GetDesc().MipLevels;
-		pd3dDevice->CreateShaderResourceView(m_pExplosionTexture, &srvDesc, d3dCpuSrvHandle_Slot2); 
-	}
-
-	{
 		D3D12_CPU_DESCRIPTOR_HANDLE d3dCpuSrvHandle_Slot3 = d3dCpuSrvHandleStart;
 		d3dCpuSrvHandle_Slot3.ptr += (m_nDescriptorIncrementSize * 3);
 		m_d3dGpuRockSrvHandle = d3dGpuSrvHandleStart;
@@ -900,7 +851,7 @@ void CScene::LoadTexture(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd
 		std::unique_ptr<uint8_t[]> ddsData;
 		std::vector<D3D12_SUBRESOURCE_DATA> subresources;
 
-		DirectX::LoadDDSTextureFromFile(pd3dDevice, L"Asset/Rock.dds", &m_pRockTexture, ddsData, subresources);
+		DirectX::LoadDDSTextureFromFile(pd3dDevice, L"Asset/DDS_File/Rock.dds", &m_pRockTexture, ddsData, subresources);
 		UINT64 nUploadBufferSize = GetRequiredIntermediateSize(m_pRockTexture, 0, (UINT)subresources.size());
 		pd3dDevice->CreateCommittedResource(
 			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE,
@@ -983,7 +934,6 @@ void CScene::AnimateObjects(float fTimeElapsed)
 		m_pLights[1].m_xmf3Direction = m_pPlayer->GetLookVector();
 	}
 
-	if (m_pParticleEmitter) m_pParticleEmitter->Animate(fTimeElapsed, NULL);
 }
 
 void CScene::RenderShadowMap(ID3D12GraphicsCommandList* pd3dCommandList, D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle)
@@ -1236,7 +1186,5 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 			}
 		}
 	}
-
-	if (m_pParticleEmitter) m_pParticleEmitter->Render(pd3dCommandList, NULL, pCamera);
 }
 

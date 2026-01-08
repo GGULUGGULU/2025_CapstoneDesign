@@ -424,3 +424,111 @@ float4 PS_Tess(DS_OUTPUT input) : SV_TARGET
     
     return float4(color.rgb * shadowFactor, color.a);
 }
+
+// ================================================================================
+// [추가] 파티클 시스템 전용 셰이더 (독립 변수 사용)
+// ================================================================================
+
+// 1. 파티클 전용 상수 버퍼 및 리소스 정의
+// (기존 변수와 이름이 겹치지 않게 'Particle' 접두어를 붙였습니다)
+
+// [b1] 카메라 정보 (EffectLibrary에서 b1에 View/Proj를 보냄)
+cbuffer cbParticleCamera : register(b6)
+{
+    matrix gmtxParticleView;
+    matrix gmtxParticleProjection;
+};
+
+// [b2] 월드 행렬 (EffectLibrary에서 b2에 World를 보냄)
+cbuffer cbParticleWorld : register(b7)
+{
+    matrix gmtxParticleWorld;
+};
+
+// [t0] 텍스처 (EffectLibrary에서 t0에 텍스처를 바인딩함)
+Texture2D gParticleTexture : register(t0);
+
+// [s0] 샘플러 (EffectLibrary에서 s0에 정적 샘플러를 바인딩함)
+SamplerState gParticleSampler : register(s0);
+
+// 2. 구조체 정의
+struct VS_PARTICLE_INPUT
+{
+    float3 position : POSITION;
+    float2 size : TEXCOORD;
+};
+
+struct VS_PARTICLE_OUTPUT
+{
+    float3 positionW : POSITION;
+    float2 size : TEXCOORD;
+};
+
+struct GS_PARTICLE_OUTPUT
+{
+    float4 positionH : SV_POSITION;
+    float2 uv : TEXCOORD;
+    uint primID : SV_PrimitiveID;
+};
+
+// 3. Vertex Shader (VS_Particle)
+VS_PARTICLE_OUTPUT VS_Particle(VS_PARTICLE_INPUT input)
+{
+    VS_PARTICLE_OUTPUT output;
+    
+    // 로컬 -> 월드 변환 (gmtxParticleWorld 사용)
+    output.positionW = mul(float4(input.position, 1.0f), gmtxParticleWorld).xyz;
+    output.size = input.size;
+    
+    return output;
+}
+
+// 4. Geometry Shader (GS_Particle)
+[maxvertexcount(4)]
+void GS_Particle(point VS_PARTICLE_OUTPUT input[1], inout TriangleStream<GS_PARTICLE_OUTPUT> outStream)
+{
+    // 빌보드 처리를 위해 카메라의 Right/Up 벡터 추출 (View 행렬 활용)
+    float3 vRight = float3(gmtxParticleView._11, gmtxParticleView._12, gmtxParticleView._13);
+    float3 vUp = float3(gmtxParticleView._21, gmtxParticleView._22, gmtxParticleView._23);
+
+    float3 p = input[0].positionW;
+    float2 halfSize = input[0].size * 0.5f;
+
+    // 사각형 꼭지점 생성
+    float4 v[4];
+    v[0] = float4(p + halfSize.x * vRight - halfSize.y * vUp, 1.0f);
+    v[1] = float4(p + halfSize.x * vRight + halfSize.y * vUp, 1.0f);
+    v[2] = float4(p - halfSize.x * vRight - halfSize.y * vUp, 1.0f);
+    v[3] = float4(p - halfSize.x * vRight + halfSize.y * vUp, 1.0f);
+
+    float2 uv[4] =
+    {
+        float2(1.0f, 1.0f), float2(1.0f, 0.0f),
+        float2(0.0f, 1.0f), float2(0.0f, 0.0f)
+    };
+
+    GS_PARTICLE_OUTPUT output;
+    [unroll]
+    for (int i = 0; i < 4; ++i)
+    {
+        // 월드 -> 뷰 -> 프로젝션
+        float4 posV = mul(v[i], gmtxParticleView);
+        output.positionH = mul(posV, gmtxParticleProjection);
+        output.uv = uv[i];
+        output.primID = (uint) i;
+        
+        outStream.Append(output);
+    }
+}
+
+// 5. Pixel Shader (PS_Particle)
+float4 PS_Particle(GS_PARTICLE_OUTPUT input) : SV_TARGET
+{
+    // 여기서 직접 정의한 텍스처와 샘플러 사용
+    float4 color = gParticleTexture.Sample(gParticleSampler, input.uv);
+    
+    // (선택사항) 투명도 알파 테스트가 필요하면 주석 해제
+    // clip(color.a - 0.1f);
+
+    return color;
+}

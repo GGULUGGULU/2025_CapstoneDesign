@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "GameFramework.h"
+#include "EffectLibrary.h"
 
 CGameFramework::CGameFramework()
 {
@@ -556,6 +557,9 @@ void CGameFramework::AnimateObjects()
 	if (m_pScene) m_pScene->AnimateObjects(fTimeElapsed);
 
 	m_pPlayer->Animate(fTimeElapsed, NULL);
+
+	// [추가] 이펙트 라이브러리 업데이트 (시간 경과 전달)
+	CEffectLibrary::Instance()->Update(fTimeElapsed);
 }
 
 void CGameFramework::WaitForGpuComplete()
@@ -707,7 +711,8 @@ void CGameFramework::CollisionProcess()
 		{
 
 			XMFLOAT3 vPos = pCollidedObject->GetPosition();
-			m_pScene->m_pParticleEmitter->SpawnExplosion(XMFLOAT3(vPos.x, vPos.y + 10, vPos.z));
+			//m_pScene->m_pParticleEmitter->SpawnExplosion(XMFLOAT3(vPos.x, vPos.y + 10, vPos.z));
+			CEffectLibrary::Instance()->Play(EFFECT_TYPE::EXPLOSION, vPos);
 
 			pCollidedObject->Disable();
 
@@ -719,7 +724,8 @@ void CGameFramework::CollisionProcess()
 		{
 
 			XMFLOAT3 vPos = pCollidedObject->GetPosition();
-			m_pScene->m_pParticleEmitter->SpawnExplosion(XMFLOAT3(vPos.x, vPos.y + 10, vPos.z));
+			//m_pScene->m_pParticleEmitter->SpawnExplosion(XMFLOAT3(vPos.x, vPos.y + 10, vPos.z));
+			CEffectLibrary::Instance()->Play(EFFECT_TYPE::EXPLOSION, XMFLOAT3(vPos.x, vPos.y+10, vPos.z));
 
 			pCollidedObject->Disable();
 
@@ -1329,6 +1335,7 @@ void CGameFramework::FrameAdvance()
 	if (2 == m_nStage)
 	{
 		RenderBlur();
+		CEffectLibrary::Instance()->Render(m_pd3dCommandList, m_pCamera->GetViewMatrix(), m_pCamera->GetProjectionMatrix());
 	}
 	else
 	{
@@ -1340,6 +1347,7 @@ void CGameFramework::FrameAdvance()
 
 		if (m_pScene) m_pScene->Render(m_pd3dCommandList, m_pCamera);
 		if (m_pPlayer) m_pPlayer->Render(m_pd3dCommandList, NULL, m_pCamera);
+	
 	}
 
 	CGameObject* pDebugBoxToRender = NULL;

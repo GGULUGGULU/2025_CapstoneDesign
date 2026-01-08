@@ -113,13 +113,6 @@ public:
 	D3D12_GPU_DESCRIPTOR_HANDLE	m_d3dGpuFlowerSrvHandle;
 	D3D12_GPU_DESCRIPTOR_HANDLE	m_d3dGpuRockSrvHandle;
 
-	CParticleEmitter* m_pParticleEmitter = NULL;
-
-	ID3D12Resource* m_pExplosionTexture = NULL;
-	ID3D12Resource* m_pExplosionTextureUploadBuffer = NULL;
-
-	D3D12_GPU_DESCRIPTOR_HANDLE	m_d3dGpuExplosionSrvHandle;
-
 	CGameObject* m_pMirrorObject = NULL; // 거울 객체
 	CReflectedObjectShader* m_pReflectedShader = NULL; // 반사된 물체 그릴 셰이더
 
