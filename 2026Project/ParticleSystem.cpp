@@ -101,6 +101,7 @@ void CParticleSystem::CollisionAnimate(float fTimeElapsed)
         {
             m_vCpuParticles[i].m_bIsActive = false;
             continue;
+        }
             const float GRAVITY = -9.8f * 2.0f;
             m_vCpuParticles[i].m_xmf3Velocity.y += GRAVITY * fTimeElapsed;
 
@@ -122,7 +123,6 @@ void CParticleSystem::CollisionAnimate(float fTimeElapsed)
             m_nActiveParticles++;
         }
 
-    }
 }
 
 void CParticleSystem::DustAnimate(float fTimeElapsed)
