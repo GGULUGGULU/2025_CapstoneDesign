@@ -179,6 +179,14 @@ void CScene::BuildGameObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLis
 	pGroundObject->m_xmCombinedLocalAABB.Extents.z *= 1.f;
 
 
+
+
+
+
+
+
+
+
 	//CMaterial* pTerrainMaterial = new CMaterial();
 	//pTerrainMaterial->SetShader(m_pTerrainShader);
 
@@ -334,7 +342,10 @@ void CScene::BuildGameObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLis
 		pItemObject3->Rotate(0.0f, 0.f, 0.0f);
 		pItemObject3->ComputeCombinedAABB();
 		m_ppGameObjects[112] = pItemObject3;
+
+
 	}
+
 
 	CreateMirror(pd3dDevice, pd3dCommandList);
 	CreateWireFrameBox(pd3dDevice, pd3dCommandList);
@@ -449,6 +460,8 @@ void CScene::CreateRockBillboard(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 		m_ppGameObjects[26 + i] = pRockObject; // index = 13
 	}
 }
+
+
 
 void CScene::CreateMirror(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
