@@ -165,14 +165,19 @@ void CScene::BuildGameObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLis
 	m_nGameObjects = 1 + 1 + 12 + 12 + 12 +1 +20 +20 +15 +15 + 4;
 	m_ppGameObjects = new CGameObject * [m_nGameObjects];
 
-	CGameObject* pGroundModel = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/city_map_02.bin");
+	CGameObject* pGroundModel = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/city_map_01.bin");
 	CGameObject* pGroundObject = new CGameObject();
 	pGroundObject->SetChild(pGroundModel);
 	pGroundObject->SetPosition(0.0f, 0.0f, 0.0f);
-	pGroundObject->Rotate(0.0f, 0.0f, 0.0f);
-	pGroundObject->SetScale(50, 50, 50);
+	pGroundObject->Rotate(0.0f, -90.0f, 0.0f);
+	pGroundObject->SetScale(100, 50, 100);
 	pGroundObject->Rotate(0.0f, 0.f, 0.0f);
 	pGroundObject->ComputeCombinedAABB();
+;
+	pGroundObject->m_xmCombinedLocalAABB.Extents.x *= 1.f;
+	pGroundObject->m_xmCombinedLocalAABB.Extents.y *= 0.05f;
+	pGroundObject->m_xmCombinedLocalAABB.Extents.z *= 1.f;
+
 
 	//CMaterial* pTerrainMaterial = new CMaterial();
 	//pTerrainMaterial->SetShader(m_pTerrainShader);
