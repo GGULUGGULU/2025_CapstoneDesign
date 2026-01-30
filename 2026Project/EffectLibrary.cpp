@@ -104,7 +104,7 @@ void CEffectLibrary::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 
 		// Èë¸ÕÁö
 		if ((EFFECT_TYPE)typeIndex == EFFECT_TYPE::DUST) {
-			nPoolSize = 250;
+			nPoolSize = 400;
 			nParticleCount = 1;
 		}
 
@@ -392,65 +392,57 @@ ActiveEffect* CEffectLibrary::Play(EFFECT_TYPE type, XMFLOAT3 position, XMFLOAT2
 
 void CEffectLibrary::Update(float fTimeElapsed)
 {
-		auto it = m_vActiveEffects.begin();
-		while (it != m_vActiveEffects.end())
+	auto it = m_vActiveEffects.begin();
+
+	while (it != m_vActiveEffects.end())
+	{
+		ActiveEffect* eff = *it;
+		bool bIsDead = false;
+
+		if (eff->pParticleSys)
 		{
-			ActiveEffect* eff = *it;
-			bool bIsDead = false; 
-
-			if (eff->pParticleSys)
+			if (eff->type == EFFECT_TYPE::BOOSTER)
 			{
-				if (eff->type == EFFECT_TYPE::BOOSTER)
-				{
-					if (eff->bActive)
-					{
-						eff->pParticleSys->BoosterAnimate(fTimeElapsed);
-					}
-					else
-					{
-					}
-				}
-				else if (eff->type == EFFECT_TYPE::DUST)
-				{
-					eff->pParticleSys->DustAnimate(fTimeElapsed);
-				}
-				else
-				{
-					eff->pParticleSys->CollisionAnimate(fTimeElapsed);
-				}
+				if (eff->bActive) eff->pParticleSys->BoosterAnimate(fTimeElapsed);
 			}
-
-			if (eff->pMeshEffect)
+			else if (eff->type == EFFECT_TYPE::DUST)
 			{
-				if (eff->pMeshEffect->IsActive())
-				{
-					eff->pMeshEffect->Update(fTimeElapsed);
-				}
+				eff->pParticleSys->DustAnimate(fTimeElapsed);
 			}
-
-			if (eff->type != EFFECT_TYPE::BOOSTER && eff->type != EFFECT_TYPE::WIND_EFFECT)
+			else // COLLISION1, 2, 3 µî
 			{
-				eff->fAge += fTimeElapsed;
-
-				if (eff->fAge > 2.0f)
-				{
-					bIsDead = true;
-				}
-			}
-
-			if (bIsDead)
-			{
-				if (eff->pParticleSys) delete eff->pParticleSys;
-				if (eff->pMeshEffect) delete eff->pMeshEffect;
-				delete eff;
-
-				it = m_vActiveEffects.erase(it);
-			}
-			else
-			{
-				++it;
+				eff->pParticleSys->CollisionAnimate(fTimeElapsed);
 			}
 		}
+
+		if (eff->pMeshEffect && eff->pMeshEffect->IsActive())
+		{
+			eff->pMeshEffect->Update(fTimeElapsed);
+		}
+
+		if (eff->type != EFFECT_TYPE::BOOSTER && eff->type != EFFECT_TYPE::WIND_EFFECT)
+		{
+			eff->fAge += fTimeElapsed;
+
+			if (eff->fAge > 2.0f)
+			{
+				bIsDead = true;
+			}
+		}
+
+		if (bIsDead)
+		{
+			eff->bActive = false; 
+
+			m_vEffectPool[(int)eff->type].push_back(eff);
+
+			it = m_vActiveEffects.erase(it);
+		}
+		else
+		{
+			++it;
+		}
+	}
 }
 
 void CEffectLibrary::Release()
