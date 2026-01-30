@@ -509,6 +509,11 @@ void CEffectLibrary::ToggleBooster(bool flag)
 	if (m_pBoosterEffect)
 	{
 		m_pBoosterEffect->bActive = flag;
+
+		if (!flag && m_pBoosterEffect->pParticleSys)
+		{
+			m_pBoosterEffect->pParticleSys->Clear();
+		}
 	}
 }
 

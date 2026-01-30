@@ -36,6 +36,8 @@ public:
 
 	void SetPosition(const XMFLOAT3& pos) { m_xmf3Position = pos; }
 
+	void Clear();
+
 private:
 	XMFLOAT3 m_xmf3Position;
 	XMFLOAT4X4 m_xmf4x4World;

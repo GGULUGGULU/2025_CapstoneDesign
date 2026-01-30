@@ -223,3 +223,13 @@ void CParticleSystem::BoosterAnimate(float fTimeElapsed)
         }
     }
 }
+
+void CParticleSystem::Clear()
+{
+    m_nActiveParticles = 0;
+
+    for (int i = 0; i < m_nMaxParticles; ++i) {
+        m_vCpuParticles[i].m_bIsActive = false;
+        m_vCpuParticles[i].m_fAge = 0.f;
+    }
+}

@@ -1083,7 +1083,7 @@ void CGameFramework::CreateShadowMap()
 	D3D12_RESOURCE_DESC d3dShadowMapDesc = {};
 	d3dShadowMapDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 	d3dShadowMapDesc.Alignment = 0;
-	d3dShadowMapDesc.Width = 8192; 
+	d3dShadowMapDesc.Width = 8192;
 	d3dShadowMapDesc.Height = 8192;
 	d3dShadowMapDesc.DepthOrArraySize = 1;
 	d3dShadowMapDesc.MipLevels = 1;

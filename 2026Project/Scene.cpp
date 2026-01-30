@@ -65,8 +65,8 @@ void CScene::BuildDefaultLightsAndMaterials()
 	m_pLights[2].m_bEnable = true;
 
 	m_pLights[2].m_nType = DIRECTIONAL_LIGHT;
-	m_pLights[2].m_xmf4Ambient = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
-	m_pLights[2].m_xmf4Diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
+	m_pLights[2].m_xmf4Ambient = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
+	m_pLights[2].m_xmf4Diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f); // 0.3 -> 0.8 // 밝게 수정
 	m_pLights[2].m_xmf4Specular = XMFLOAT4(0.4f, 0.4f, 0.4f, 0.0f);
 	m_pLights[2].m_xmf3Direction = XMFLOAT3(1.0f, -1.0f, 0.5f); // 위에서 아래로 방향-> 사선7시방향
 	m_pLights[3].m_bEnable = true;
@@ -118,35 +118,35 @@ void CScene::BuildObjectsGameEnd(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }//
 
-void SetTerrainRecursive(CGameObject* pObject, D3D12_PRIMITIVE_TOPOLOGY topology, CMaterial* pMaterial)
-{
-	if (!pObject) return;
-	if (pObject->m_pMesh)
-	{
-		pObject->m_pMesh->SetPrimitiveTopology(topology);
-
-		if (pMaterial)
-		{
-			if (pObject->m_ppMaterials)
-			{
-				for (int i = 0; i < pObject->m_nMaterials; i++)
-				{
-					if (pObject->m_ppMaterials[i]) pObject->m_ppMaterials[i]->Release();
-				}
-				delete[] pObject->m_ppMaterials;
-				pObject->m_ppMaterials = NULL;
-			}
-
-			pObject->m_nMaterials = 1;
-			pObject->m_ppMaterials = new CMaterial * [1];
-			pObject->m_ppMaterials[0] = NULL;
-			pObject->SetMaterial(0, pMaterial);
-		}
-	}
-
-	if (pObject->m_pSibling) SetTerrainRecursive(pObject->m_pSibling, topology, pMaterial);
-	if (pObject->m_pChild) SetTerrainRecursive(pObject->m_pChild, topology, pMaterial);
-}
+//void SetTerrainRecursive(CGameObject* pObject, D3D12_PRIMITIVE_TOPOLOGY topology, CMaterial* pMaterial)
+//{
+//	if (!pObject) return;
+//	if (pObject->m_pMesh)
+//	{
+//		pObject->m_pMesh->SetPrimitiveTopology(topology);
+//
+//		if (pMaterial)
+//		{
+//			if (pObject->m_ppMaterials)
+//			{
+//				for (int i = 0; i < pObject->m_nMaterials; i++)
+//				{
+//					if (pObject->m_ppMaterials[i]) pObject->m_ppMaterials[i]->Release();
+//				}
+//				delete[] pObject->m_ppMaterials;
+//				pObject->m_ppMaterials = NULL;
+//			}
+//
+//			pObject->m_nMaterials = 1;
+//			pObject->m_ppMaterials = new CMaterial * [1];
+//			pObject->m_ppMaterials[0] = NULL;
+//			pObject->SetMaterial(0, pMaterial);
+//		}
+//	}
+//
+//	if (pObject->m_pSibling) SetTerrainRecursive(pObject->m_pSibling, topology, pMaterial);
+//	if (pObject->m_pChild) SetTerrainRecursive(pObject->m_pChild, topology, pMaterial);
+//}
 
 void CScene::BuildGameObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
@@ -171,7 +171,6 @@ void CScene::BuildGameObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLis
 	pGroundObject->SetPosition(0.0f, 0.0f, 0.0f);
 	pGroundObject->Rotate(0.0f, 90.0f, 0.0f);
 	pGroundObject->SetScale(10, 10, 10);
-	pGroundObject->Rotate(0.0f, 0.f, 0.0f);
 	pGroundObject->ComputeCombinedAABB();
 
 	pGroundObject->m_xmCombinedLocalAABB.Extents.x *= 1.0f;
