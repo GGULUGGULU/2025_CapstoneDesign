@@ -27,7 +27,7 @@ class CMeshEffect
 	CMeshEffect(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	~CMeshEffect();
 
-	void CreateSphereMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fRadius, int nSlices, int nStacks);
+	void CreateMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fRadius, int nSlices, int nStacks);
 	void CreateTexture(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const wchar_t* pszFileName);
 
 	void CreateProceduralTexture(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);

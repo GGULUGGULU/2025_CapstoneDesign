@@ -16,7 +16,15 @@ enum class EFFECT_TYPE
 	COLLISION2, // √Êµπ
 	COLLISION3, // √Êµπ
 	DUST, // »Î∏’¡ˆ
-	//ITEM, // æ∆¿Ã≈€ »πµÊ
+	ITEM1, // æ∆¿Ã≈€ »πµÊ
+	ITEM2, // æ∆¿Ã≈€ »πµÊ
+	ITEM3, // æ∆¿Ã≈€ »πµÊ
+	ITEM4, // æ∆¿Ã≈€ »πµÊ
+	ITEM5, // æ∆¿Ã≈€ »πµÊ
+	ITEM6, // æ∆¿Ã≈€ »πµÊ
+	ITEM7, // æ∆¿Ã≈€ »πµÊ
+	ITEM8, // æ∆¿Ã≈€ »πµÊ
+	ITEM9, // æ∆¿Ã≈€ »πµÊ
 	BOOSTER, // ∫ŒΩ∫≈Õ
 	WIND_EFFECT,
 	COUNT // ∞≥ºˆ
@@ -65,14 +73,21 @@ private:
 		L"Asset/DDS_File/GreenStar.dds",
 		L"Asset/DDS_File/RedStar.dds",
 		L"Asset/DDS_File/PurpleStar.dds",
+		/////////////////////////////////////////////////
 		L"Asset/DDS_File/Dust.dds",
+		/////////////////////////////////////////////////
+		L"Asset/DDS_File/LongPinkRibbon.dds",
+		L"Asset/DDS_File/LongRedRibbon.dds",
+		L"Asset/DDS_File/LongYellowRibbon.dds",
+		L"Asset/DDS_File/PinkCircle.dds",
+		L"Asset/DDS_File/PinkTriangle.dds",
+		L"Asset/DDS_File/ShortPinkRibbon.dds",
+		L"Asset/DDS_File/ShortYellowRibbon.dds",
+		L"Asset/DDS_File/YellowCircle.dds",
+		L"Asset/DDS_File/YellowTriangle.dds"
+		/////////////////////////////////////////////////
 		L"Asset/DDS_File/Booster.dds",
-		L"Asset/DDS_File/WindShield.dds"
-		/*
-		L"Asset/DDS_File/WindShield.dds"
-		
-
-		*/
+		L"Asset/DDS_File/WindShield.dds",
 	};
 
 	UINT m_nSrvDescriptorIncrementSize = 0;

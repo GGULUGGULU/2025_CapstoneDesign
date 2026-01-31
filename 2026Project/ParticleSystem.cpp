@@ -35,13 +35,13 @@ CParticleSystem::~CParticleSystem()
 	}
 }
 
-void CParticleSystem::ResetParticles(const XMFLOAT2& size)
+void CParticleSystem::ResetParticles(const XMFLOAT2& size, float fSpreadRange)
 {
     static std::mt19937 gen(std::random_device{}());
     std::uniform_real_distribution<float> distDir(-1.0f, 1.0f);
     std::uniform_real_distribution<float> distSpeed(10.0f, 50.0f);
     std::uniform_real_distribution<float> distLife(0.5f, 1.5f);   
-    std::uniform_real_distribution<float> distPos(-2.0f, 2.0f); // 좌우 랜덤 분포
+    std::uniform_real_distribution<float> distPos(-fSpreadRange, fSpreadRange); // 좌우 랜덤 분포
 
     m_nActiveParticles = 0;
 
@@ -128,7 +128,7 @@ void CParticleSystem::CollisionAnimate(float fTimeElapsed)
             m_pMappedParticles[m_nActiveParticles].m_xmf2Size = currentSize;
 
             m_nActiveParticles++;
-        }
+    }
 
 }
 
@@ -171,6 +171,44 @@ void CParticleSystem::DustAnimate(float fTimeElapsed)
         m_pMappedParticles[m_nActiveParticles].m_xmf3Position = m_vCpuParticles[i].m_xmf3Position;
         m_pMappedParticles[m_nActiveParticles].m_xmf2Size = currentSize;
 
+        m_nActiveParticles++;
+    }
+}
+
+void CParticleSystem::ItemAnimate(float fTimeElapsed)
+{
+    m_nActiveParticles = 0;
+
+    for (int i = 0; i < m_nMaxParticles; i++)
+    {
+        if (!m_vCpuParticles[i].m_bIsActive) continue;
+
+        m_vCpuParticles[i].m_fAge += fTimeElapsed;
+
+        if (m_vCpuParticles[i].m_fAge > m_vCpuParticles[i].m_fLifeTime)
+        {
+            m_vCpuParticles[i].m_bIsActive = false;
+            continue;
+        }
+
+        // 위치 이동 (등속 운동)
+        // 필요하다면 여기에 중력(y -= gravity * time)을 추가해도 됨
+        m_vCpuParticles[i].m_xmf3Position.x += m_vCpuParticles[i].m_xmf3Velocity.x * fTimeElapsed;
+        m_vCpuParticles[i].m_xmf3Position.y += m_vCpuParticles[i].m_xmf3Velocity.y * fTimeElapsed;
+        m_vCpuParticles[i].m_xmf3Position.z += m_vCpuParticles[i].m_xmf3Velocity.z * fTimeElapsed;
+
+        // 크기 애니메이션 (생성되었다가 서서히 작아짐)
+        float fLifeRatio = m_vCpuParticles[i].m_fAge / m_vCpuParticles[i].m_fLifeTime;
+        float fScale = 1.0f - fLifeRatio; // 1 -> 0
+
+        XMFLOAT2 currentSize;
+        currentSize.x = m_vCpuParticles[i].m_xmf2MaxSize.x * fScale;
+        currentSize.y = m_vCpuParticles[i].m_xmf2MaxSize.y * fScale;
+
+        // GPU 매핑
+        m_pMappedParticles[m_nActiveParticles].m_xmf3Position = m_vCpuParticles[i].m_xmf3Position;
+        m_pMappedParticles[m_nActiveParticles].m_xmf2Size = currentSize;
+       
         m_nActiveParticles++;
     }
 }

@@ -68,7 +68,7 @@ void CEffectLibrary::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 		if ((EFFECT_TYPE)typeIndex == EFFECT_TYPE::WIND_EFFECT)
 		{
 			CMeshEffect* pShield = new CMeshEffect(pd3dDevice, pd3dCommandList);
-			pShield->CreateSphereMesh(pd3dDevice, pd3dCommandList, 15.0f, 20, 20);
+			pShield->CreateMesh(pd3dDevice, pd3dCommandList, 15.0f, 20, 20);
 			pShield->CreateProceduralTexture(pd3dDevice, pd3dCommandList); 
 			//pShield->CreateTexture(pd3dDevice, pd3dCommandList, L"Asset/DDS_File/WindShield.dds");
 
@@ -100,7 +100,7 @@ void CEffectLibrary::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 
 		// 기타 파티클 생성
 		int nPoolSize = 50;
-		int nParticleCount = 5;
+		int nParticleCount = 3;
 
 		// 흙먼지
 		if ((EFFECT_TYPE)typeIndex == EFFECT_TYPE::DUST) {
@@ -377,7 +377,19 @@ ActiveEffect* CEffectLibrary::Play(EFFECT_TYPE type, XMFLOAT3 position, XMFLOAT2
 	{
 		// 파티클 시스템
 		pEffectData->pParticleSys->SetPosition(position);
-		pEffectData->pParticleSys->ResetParticles(size);
+
+		float fSpread = 10.0f; // 기본값
+
+		if (type >= EFFECT_TYPE::ITEM1 && type <= EFFECT_TYPE::ITEM9)
+		{
+			fSpread = 50.0f;
+		}
+		else if (type >= EFFECT_TYPE::COLLISION1 && type <= EFFECT_TYPE::COLLISION3)
+		{
+			fSpread = 20.0f;
+		}
+
+		pEffectData->pParticleSys->ResetParticles(size, fSpread);
 	}
 	else if (pEffectData->pMeshEffect)
 	{
@@ -408,6 +420,10 @@ void CEffectLibrary::Update(float fTimeElapsed)
 			else if (eff->type == EFFECT_TYPE::DUST)
 			{
 				eff->pParticleSys->DustAnimate(fTimeElapsed);
+			}
+			else if (eff->type >= EFFECT_TYPE::ITEM1 && eff->type <= EFFECT_TYPE::ITEM9)
+			{
+				eff->pParticleSys->ItemAnimate(fTimeElapsed);
 			}
 			else // COLLISION1, 2, 3 등
 			{

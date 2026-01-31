@@ -773,9 +773,7 @@ void CGameFramework::CollisionProcess()
 
 			XMFLOAT3 vPos = pCollidedObject->GetPosition();
 			//m_pScene->m_pParticleEmitter->SpawnExplosion(XMFLOAT3(vPos.x, vPos.y + 10, vPos.z));
-			CEffectLibrary::Instance()->Play(EFFECT_TYPE::COLLISION1, vPos, XMFLOAT2(50, 50));
-			CEffectLibrary::Instance()->Play(EFFECT_TYPE::COLLISION2, vPos, XMFLOAT2(50, 50));
-			CEffectLibrary::Instance()->Play(EFFECT_TYPE::COLLISION3, vPos, XMFLOAT2(50, 50));
+			
 
 			pCollidedObject->Disable();
 
@@ -788,9 +786,19 @@ void CGameFramework::CollisionProcess()
 
 			XMFLOAT3 vPos = pCollidedObject->GetPosition();
 			//m_pScene->m_pParticleEmitter->SpawnExplosion(XMFLOAT3(vPos.x, vPos.y + 10, vPos.z));
-			CEffectLibrary::Instance()->Play(EFFECT_TYPE::COLLISION1, XMFLOAT3(vPos.x, vPos.y+10, vPos.z), XMFLOAT2(50, 50));
-			CEffectLibrary::Instance()->Play(EFFECT_TYPE::COLLISION2, XMFLOAT3(vPos.x, vPos.y+10, vPos.z), XMFLOAT2(50, 50));
-			CEffectLibrary::Instance()->Play(EFFECT_TYPE::COLLISION3, XMFLOAT3(vPos.x, vPos.y+10, vPos.z), XMFLOAT2(50, 50));
+			//CEffectLibrary::Instance()->Play(EFFECT_TYPE::COLLISION1, XMFLOAT3(vPos.x, vPos.y+10, vPos.z), XMFLOAT2(50, 50));
+			//CEffectLibrary::Instance()->Play(EFFECT_TYPE::COLLISION2, XMFLOAT3(vPos.x, vPos.y+10, vPos.z), XMFLOAT2(50, 50));
+			//CEffectLibrary::Instance()->Play(EFFECT_TYPE::COLLISION3, XMFLOAT3(vPos.x, vPos.y+10, vPos.z), XMFLOAT2(50, 50));
+
+			CEffectLibrary::Instance()->Play(EFFECT_TYPE::ITEM1, vPos, XMFLOAT2(50, 50));
+			CEffectLibrary::Instance()->Play(EFFECT_TYPE::ITEM2, vPos, XMFLOAT2(50, 50));
+			CEffectLibrary::Instance()->Play(EFFECT_TYPE::ITEM3, vPos, XMFLOAT2(50, 50));
+			CEffectLibrary::Instance()->Play(EFFECT_TYPE::ITEM4, vPos, XMFLOAT2(25, 25));
+			CEffectLibrary::Instance()->Play(EFFECT_TYPE::ITEM5, vPos, XMFLOAT2(50, 50));
+			CEffectLibrary::Instance()->Play(EFFECT_TYPE::ITEM6, vPos, XMFLOAT2(50, 50));
+			CEffectLibrary::Instance()->Play(EFFECT_TYPE::ITEM7, vPos, XMFLOAT2(50, 50));
+			CEffectLibrary::Instance()->Play(EFFECT_TYPE::ITEM8, vPos, XMFLOAT2(25, 25));
+			CEffectLibrary::Instance()->Play(EFFECT_TYPE::ITEM9, vPos, XMFLOAT2(50, 50));
 
 			pCollidedObject->Disable();
 

@@ -21,7 +21,7 @@ CMeshEffect::~CMeshEffect()
     if (m_pSrvHeap) m_pSrvHeap->Release();
 }
 
-void CMeshEffect::CreateSphereMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fRadius, int nSlices, int nStacks)
+void CMeshEffect::CreateMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fRadius, int nSlices, int nStacks)
 {
     std::vector<EFFECT_VERTEX> vVertices;
     std::vector<UINT> vIndices;
