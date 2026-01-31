@@ -582,7 +582,7 @@ void CGameFramework::ProcessInputGameStage()
 			}
 			else if (dwDirection) m_pPlayer->Move(dwDirection, m_nPlayerCurrentSpeed, true);
 
-			CEffectLibrary::Instance()->Play(EFFECT_TYPE::DUST, XMFLOAT3(m_pPlayer->GetPosition().x, m_pPlayer->GetPosition().y-50, m_pPlayer->GetPosition().z-20), XMFLOAT2(10,10));
+			CEffectLibrary::Instance()->Play(EFFECT_TYPE::DUST, XMFLOAT3(m_pPlayer->GetPosition().x, m_pPlayer->GetPosition().y, m_pPlayer->GetPosition().z), XMFLOAT2(5,5));
 		}
 	}
 

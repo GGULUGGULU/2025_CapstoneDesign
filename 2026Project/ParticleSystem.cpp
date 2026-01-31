@@ -41,6 +41,7 @@ void CParticleSystem::ResetParticles(const XMFLOAT2& size)
     std::uniform_real_distribution<float> distDir(-1.0f, 1.0f);
     std::uniform_real_distribution<float> distSpeed(10.0f, 50.0f);
     std::uniform_real_distribution<float> distLife(0.5f, 1.5f);   
+    std::uniform_real_distribution<float> distPos(-2.0f, 2.0f); // ÁÂ¿ì ·£´ý ºÐÆ÷
 
     m_nActiveParticles = 0;
 
@@ -51,7 +52,13 @@ void CParticleSystem::ResetParticles(const XMFLOAT2& size)
         m_vCpuParticles[i].m_fAge = 0.0f;
         m_vCpuParticles[i].m_fLifeTime = distLife(gen);
 
-        m_vCpuParticles[i].m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
+        //m_vCpuParticles[i].m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
+
+        m_vCpuParticles[i].m_xmf3Position = XMFLOAT3(
+            distPos(gen),        
+            distPos(gen) * 0.5f, 
+            distPos(gen)         
+        );
 
         m_vCpuParticles[i].m_xmf2MaxSize = XMFLOAT2(size); // Å©±â
 

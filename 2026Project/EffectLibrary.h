@@ -68,6 +68,11 @@ private:
 		L"Asset/DDS_File/Dust.dds",
 		L"Asset/DDS_File/Booster.dds",
 		L"Asset/DDS_File/WindShield.dds"
+		/*
+		L"Asset/DDS_File/WindShield.dds"
+		
+
+		*/
 	};
 
 	UINT m_nSrvDescriptorIncrementSize = 0;
